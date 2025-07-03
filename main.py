@@ -40,19 +40,22 @@ async def score_post(data: PostRequest):
         prompt = template.replace("{post}", data.post)
 
         response = client.chat.completions.create(
-            model="gpt-4o",  # gpt-3.5-turbo, gpt-4o, 
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "あなたはSNS投稿の辛口評論家で、やや皮肉屋です。"},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.8,
         )
-        result.textContent = data.analysis;
 
+        # OpenAIのレスポンスから本文を取得
+        analysis = response.choices[0].message.content
+        return {"analysis": analysis}
 
     except Exception as e:
         print("OpenAI API Error:", e)
         return {"error": str(e)}
+
 
 
 def get_tweet_text(tweet_id: str) -> str:
