@@ -7,6 +7,7 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 from fastapi.staticfiles import StaticFiles
+import requests
 
 
 load_dotenv()
@@ -52,3 +53,13 @@ async def score_post(data: PostRequest):
         print("OpenAI API Error:", e)
         return {"error": str(e)}
 
+
+def get_tweet_text(tweet_id: str) -> str:
+    token = os.getenv("X_BEARER_TOKEN")
+    headers = {"Authorization": f"Bearer {token}"}
+    url = f"https://api.twitter.com/2/tweets/{tweet_id}?tweet.fields=text"
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.json()["data"]["text"]
+    else:
+        return "ツイートの取得に失敗しました"
