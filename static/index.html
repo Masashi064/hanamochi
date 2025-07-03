@@ -75,6 +75,7 @@
   <p>気になるXの投稿文をここに貼り付けてください。</p>
 
   <textarea id="postInput" placeholder="ここにポストを入力..."></textarea><br>
+  <div id="tweetPreview" style="margin-bottom: 1rem;"></div>
   <button onclick="analyzePost()">分析する</button>
   <button onclick="clearForm()">クリア</button>
 
@@ -89,21 +90,53 @@
       const status = document.getElementById("status");
       const progressBar = document.getElementById("progressBar");
       const result = document.getElementById("result");
+      const tweetPreview = document.getElementById("tweetPreview");
 
-      status.textContent = "分析中…";
+        // XのURLならプレビュー表示
+        const twitterMatch = post.match(/https:\/\/twitter\.com\/[^\/]+\/status\/\d+/);
+        if (twitterMatch) {
+          tweetPreview.innerHTML = `
+            <blockquote class="twitter-tweet">
+              <a href="${twitterMatch[0]}"></a>
+            </blockquote>
+          `;
+          if (window.twttr && window.twttr.widgets) {
+            twttr.widgets.load();
+          }
+        } else {
+          tweetPreview.innerHTML = "";
+        }
+
+
+      // 状態表示
+      status.textContent = "分析中...";
       progressBar.style.display = "block";
       result.textContent = "";
 
-      const response = await fetch("/score", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ post }),
-      });
+      try {
+        const response = await fetch("/score", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ post }),
+        });
 
-      const data = await response.json();
-      status.textContent = "分析完了！";
-      progressBar.style.display = "none";
-      result.textContent = data.analysis;
+        const data = await response.json();
+
+        status.textContent = "分析完了！";
+        progressBar.style.display = "none";
+
+        if (data.analysis) {
+          result.textContent = data.analysis;
+        } else if (data.error) {
+          result.textContent = "エラーが発生しました: " + data.error;
+        } else {
+          result.textContent = "不明なエラーが発生しました。";
+        }
+      } catch (error) {
+        status.textContent = "エラー発生！";
+        progressBar.style.display = "none";
+        result.textContent = "通信エラー: " + error.message;
+      }
     }
 
     function clearForm() {
@@ -112,6 +145,9 @@
       document.getElementById("progressBar").style.display = "none";
       document.getElementById("result").textContent = "";
     }
+
+    
   </script>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 </body>
 </html>
