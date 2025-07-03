@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse 
 from pydantic import BaseModel
 import openai
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
 from fastapi.staticfiles import StaticFiles
+
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
