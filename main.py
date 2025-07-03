@@ -11,7 +11,11 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI()
 app = FastAPI()
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+app.mount("/static", StaticFiles(directory="static", html=True), name="static")
+
+@app.get("/")
+async def serve_index():
+    return FileResponse("static/index.html")
 
 # ★ CORS設定（全てのオリジンから許可 → 必要に応じて限定可）
 app.add_middleware(
