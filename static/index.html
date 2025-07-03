@@ -89,6 +89,7 @@
 
   <div id="result"></div>
 
+  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
   <script>
     async function analyzePost() {
       const post = document.getElementById("postInput").value;
@@ -105,9 +106,15 @@
             <a href="${twitterMatch[0]}"></a>
           </blockquote>
         `;
-        // Twitterウィジェット読み込み
         if (window.twttr && window.twttr.widgets) {
           window.twttr.widgets.load(tweetPreview);
+        } else {
+          // widgets.js がまだ読み込まれていない場合に備える
+          setTimeout(() => {
+            if (window.twttr && window.twttr.widgets) {
+              window.twttr.widgets.load(tweetPreview);
+            }
+          }, 1000);
         }
       } else {
         tweetPreview.innerHTML = "";
@@ -152,6 +159,5 @@
       document.getElementById("tweetPreview").innerHTML = "";
     }
   </script>
-  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 </body>
 </html>
