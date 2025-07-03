@@ -47,7 +47,8 @@ async def score_post(data: PostRequest):
             ],
             temperature=0.8,
         )
-        return {"analysis": response.choices[0].message.content}
+        result.textContent = data.analysis;
+
 
     except Exception as e:
         print("OpenAI API Error:", e)

@@ -94,7 +94,7 @@
       progressBar.style.display = "block";
       result.textContent = "";
 
-      const response = await fetch("/analyze", {
+      const response = await fetch("/score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ post }),
@@ -103,7 +103,7 @@
       const data = await response.json();
       status.textContent = "分析完了！";
       progressBar.style.display = "none";
-      result.textContent = data.result;
+      result.textContent = data.analysis;
     }
 
     function clearForm() {
