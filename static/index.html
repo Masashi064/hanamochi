@@ -49,16 +49,21 @@
     }
 
     #progress {
-      width: 0%;
+      width: 100%;
       height: 100%;
-      background-color: #4caf50;
-      animation: loading 2s infinite;
+      background: repeating-linear-gradient(
+        -45deg,
+        #4caf50,
+        #4caf50 10px,
+        #66bb6a 10px,
+        #66bb6a 20px
+      );
+      animation: loading 1s linear infinite;
     }
 
     @keyframes loading {
-      0% { width: 0%; }
-      50% { width: 80%; }
-      100% { width: 0%; }
+      0% { background-position: 0 0; }
+      100% { background-position: 40px 0; }
     }
 
     #result {
@@ -92,21 +97,21 @@
       const result = document.getElementById("result");
       const tweetPreview = document.getElementById("tweetPreview");
 
-        // XのURLならプレビュー表示
-        const twitterMatch = post.match(/https:\/\/twitter\.com\/[^\/]+\/status\/\d+/);
-        if (twitterMatch) {
-          tweetPreview.innerHTML = `
-            <blockquote class="twitter-tweet">
-              <a href="${twitterMatch[0]}"></a>
-            </blockquote>
-          `;
-          if (window.twttr && window.twttr.widgets) {
-            twttr.widgets.load();
-          }
-        } else {
-          tweetPreview.innerHTML = "";
+      // XのURLならプレビュー表示
+      const twitterMatch = post.match(/https:\/\/(x|twitter)\.com\/[^\/]+\/status\/\d+/);
+      if (twitterMatch) {
+        tweetPreview.innerHTML = `
+          <blockquote class="twitter-tweet">
+            <a href="${twitterMatch[0]}"></a>
+          </blockquote>
+        `;
+        // Twitterウィジェット読み込み
+        if (window.twttr && window.twttr.widgets) {
+          window.twttr.widgets.load(tweetPreview);
         }
-
+      } else {
+        tweetPreview.innerHTML = "";
+      }
 
       // 状態表示
       status.textContent = "分析中...";
@@ -144,10 +149,9 @@
       document.getElementById("status").textContent = "";
       document.getElementById("progressBar").style.display = "none";
       document.getElementById("result").textContent = "";
+      document.getElementById("tweetPreview").innerHTML = "";
     }
-
-    
   </script>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 </body>
 </html>
