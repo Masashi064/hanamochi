@@ -1,80 +1,73 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>Xスコア分析</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hanamochi ポスト分析</title>
   <style>
     body {
-      font-family: sans-serif;
-      max-width: 700px;
-      margin: 50px auto;
-      padding: 20px;
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background-color: #f9f9f9;
+      max-width: 600px;
+      margin: auto;
     }
+
+    h1 {
+      text-align: center;
+    }
+
     textarea {
       width: 100%;
-      height: 120px;
-      padding: 10px;
-      font-size: 16px;
+      height: 150px;
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      font-size: 1rem;
     }
+
     button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
+      padding: 0.6rem 1.2rem;
+      margin-right: 0.5rem;
+      font-size: 1rem;
+      cursor: pointer;
     }
+
     #result {
-      margin-top: 30px;
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: #fff;
+      border: 1px solid #ccc;
       white-space: pre-wrap;
-      background-color: #f9f9f9;
-      border-left: 4px solid #999;
-      padding: 15px;
     }
   </style>
 </head>
 <body>
-
-  <h1>ポスト分析ツール（Xスコア）</h1>
-  <p>「はなもちならなさ」を分析したいSNSポストを下の欄に入力してください。</p>
+  <h1>💥 Hanamochi ポスト分析</h1>
+  <p>気になるXの投稿文をここに貼り付けてください。AIが投稿文を分析します。</p>
 
   <textarea id="postInput" placeholder="ここにポストを入力..."></textarea><br>
   <button onclick="analyzePost()">分析する</button>
+  <button onclick="clearForm()">クリア</button>
 
   <div id="result"></div>
 
   <script>
     async function analyzePost() {
       const post = document.getElementById("postInput").value;
-      if (!post.trim()) {
-        alert("ポストを入力してください！");
-        return;
-      }
+      const response = await fetch("/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ post }),
+      });
 
-      document.getElementById("result").innerText = "分析中です…";
+      const data = await response.json();
+      document.getElementById("result").innerText = data.result;
+    }
 
-      try {
-        const response = await fetch("https://hanamochi.onrender.com/score", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ post: post })
-        });
-
-        const data = await response.json();
-
-        if (data.analysis) {
-          document.getElementById("result").innerText = data.analysis;
-        } else if (data.error) {
-          document.getElementById("result").innerText = "⚠️ サーバーエラー: " + data.error;
-        } else {
-          document.getElementById("result").innerText = "⚠️ 不明なエラーが発生しました。";
-        }
-
-      } catch (error) {
-        document.getElementById("result").innerText = "❌ ネットワークエラー。サーバーが起動中か確認してください。";
-        console.error(error);
-      }
+    function clearForm() {
+      document.getElementById("postInput").value = "";
+      document.getElementById("result").innerHTML = "";
     }
   </script>
-
 </body>
 </html>
