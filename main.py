@@ -9,11 +9,9 @@ from fastapi.staticfiles import StaticFiles
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
-
 client = OpenAI()
-
 app = FastAPI()
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 # ★ CORS設定（全てのオリジンから許可 → 必要に応じて限定可）
 app.add_middleware(
